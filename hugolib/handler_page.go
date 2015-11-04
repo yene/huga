@@ -14,6 +14,9 @@
 package hugolib
 
 import (
+	"html/template"
+	"regexp"
+
 	"github.com/spf13/hugo/helpers"
 	"github.com/spf13/hugo/source"
 	"github.com/spf13/hugo/tpl"
@@ -71,7 +74,11 @@ func (h markdownHandler) PageConvert(p *Page, t tpl.Template) HandledResult {
 		tmpTableOfContents = replaced[1]
 	}
 
-	p.Content = helpers.BytesToHTML(tmpContent)
+	s := string(tmpContent)
+	r, _ := regexp.Compile("<!--(.*?)-->")
+	s = r.ReplaceAllString(s, "")
+	p.Content = template.HTML(s)
+
 	p.TableOfContents = helpers.BytesToHTML(tmpTableOfContents)
 
 	return HandledResult{err: nil}
