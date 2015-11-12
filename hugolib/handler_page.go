@@ -21,6 +21,7 @@ import (
 	"github.com/spf13/hugo/source"
 	"github.com/spf13/hugo/tpl"
 	jww "github.com/spf13/jwalterweatherman"
+	"github.com/spf13/viper"
 )
 
 func init() {
@@ -75,8 +76,10 @@ func (h markdownHandler) PageConvert(p *Page, t tpl.Template) HandledResult {
 	}
 
 	s := string(tmpContent)
-	r, _ := regexp.Compile("<!--(.*?)-->")
-	s = r.ReplaceAllString(s, "")
+	if viper.GetBool("RemoveHTMLComments") {
+		r, _ := regexp.Compile("<!--(.*?)-->")
+		s = r.ReplaceAllString(s, "")
+	}
 	p.Content = template.HTML(s)
 
 	p.TableOfContents = helpers.BytesToHTML(tmpTableOfContents)
