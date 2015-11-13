@@ -90,14 +90,7 @@ func MakePathSanitized(s string) string {
 // MakeTitle takes the file name with separator
 // and returns a string with the first letter of each word uppercase.
 func MakeTitle(inpath string) string {
-	p := strings.Split(strings.TrimSpace(inpath), "-")
-	for i, _ := range p {
-		if len(p[i]) > 0 {
-			p[i] = strings.ToUpper(p[i][0:1]) + p[i][1:len(p[i])]
-		}
-	}
-
-	return strings.Join(p, " ")
+	return strings.Title(strings.Replace(strings.TrimSpace(inpath), "-", " ", -1))
 }
 
 func UnicodeSanitize(s string) string {
