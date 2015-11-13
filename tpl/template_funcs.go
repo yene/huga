@@ -14,7 +14,6 @@
 package tpl
 
 import (
-	"bitbucket.org/pkg/inflect"
 	"bytes"
 	"encoding/base64"
 	"errors"
@@ -27,6 +26,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"bitbucket.org/pkg/inflect"
 
 	"github.com/spf13/cast"
 	"github.com/spf13/hugo/helpers"
@@ -1156,6 +1157,45 @@ func Replace(a, b, c interface{}) (string, error) {
 	return strings.Replace(aStr, bStr, cStr, -1), nil
 }
 
+// ElapsedTime converts elapsed duration to the nearest human
+// readable presentation.
+func ElapsedTime(t time.Time) (string, error) {
+	// TODO: check if it really is a date, make a test with a string
+	// TODO: localize date format it? is it localized
+	diff := time.Now().Sub(t)
+	min := int(diff.Minutes())
+	if min < 60 {
+		if min == 1 {
+			return fmt.Sprintf("%d minute ago", min), nil
+		}
+		return fmt.Sprintf("%d minutes ago", min), nil
+	}
+
+	hrs := int(diff.Hours())
+	if hrs < 24 {
+		if hrs == 1 {
+			return fmt.Sprintf("%d hour ago", hrs), nil
+		}
+		return fmt.Sprintf("%d hours ago", hrs), nil
+	}
+
+	days := int(diff.Hours() / 24)
+	if days < 30 {
+		if days == 1 {
+			return fmt.Sprintf("%d day ago", days), nil
+		}
+		return fmt.Sprintf("%d days ago", days), nil
+	}
+
+	if t.Year() == time.Now().Year() {
+		return t.Format("Jan 2"), nil
+	} else {
+		return t.Format("Jan 2, 2006"), nil
+	}
+
+	return "", nil // Todo: return error, bogus date
+}
+
 // DateFormat converts the textual representation of the datetime string into
 // the other form or returns it of the time.Time value. These are formatted
 // with the layout string
@@ -1414,6 +1454,7 @@ func init() {
 		"replace":      Replace,
 		"trim":         Trim,
 		"dateFormat":   DateFormat,
+		"elapsedTime":  ElapsedTime,
 		"getJSON":      GetJSON,
 		"getCSV":       GetCSV,
 		"readDir":      ReadDir,
