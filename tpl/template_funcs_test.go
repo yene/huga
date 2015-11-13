@@ -1442,6 +1442,48 @@ func TestTrim(t *testing.T) {
 	assert.NotNil(t, e, "tstNoStringer isn't trimmable")
 }
 
+func TestElapsedTime(t *testing.T) {
+	for i, this := range []struct {
+		elapsed time.Duration
+		expect  string
+	}{
+		{-1 * time.Second * 5, "0 minutes ago"},
+		{-1 * time.Minute * 1, "1 minute ago"},
+		{-1 * time.Minute * 5, "5 minutes ago"},
+		{-1 * time.Minute * 60 * 24 * 1, "1 day ago"},
+		{-1 * time.Minute * 60 * 24 * 2, "2 days ago"},
+	} {
+		result, err := ElapsedTime(time.Now().Add(this.elapsed))
+
+		if err != nil {
+			t.Errorf("[%d] ElapsedTime failed: %s", i, err)
+			continue
+		}
+		if result != this.expect {
+			t.Errorf("[%d] ElapsedTime got %v but expected %v", i, result, this.expect)
+		}
+	}
+
+	// Note: this test breaks in 2016
+	for i, this := range []struct {
+		date   time.Time
+		expect string
+	}{
+		{time.Date(2015, time.January, 1, 0, 0, 0, 0, time.UTC), "Jan 1"},
+		{time.Date(2014, time.January, 1, 0, 0, 0, 0, time.UTC), "Jan 1, 2014"},
+	} {
+		result, err := ElapsedTime(this.date)
+
+		if err != nil {
+			t.Errorf("[%d] ElapsedTime failed: %s", i, err)
+			continue
+		}
+		if result != this.expect {
+			t.Errorf("[%d] ElapsedTime got %v but expected %v", i, result, this.expect)
+		}
+	}
+}
+
 func TestDateFormat(t *testing.T) {
 	for i, this := range []struct {
 		layout string
