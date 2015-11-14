@@ -9,6 +9,7 @@ import (
 	"path"
 	"reflect"
 	"runtime"
+	"strconv"
 	"testing"
 	"time"
 
@@ -1447,11 +1448,11 @@ func TestElapsedTime(t *testing.T) {
 		elapsed time.Duration
 		expect  string
 	}{
-		{-1 * time.Second * 5, "0 minutes ago"},
+		{-1 * time.Second * 5, "5 seconds ago"},
 		{-1 * time.Minute * 1, "1 minute ago"},
 		{-1 * time.Minute * 5, "5 minutes ago"},
 		{-1 * time.Minute * 60 * 24 * 1, "1 day ago"},
-		{-1 * time.Minute * 60 * 24 * 2, "2 days ago"},
+		{-1 * time.Minute * 60 * 24 * 5, "5 days ago"},
 	} {
 		result, err := ElapsedTime(time.Now().Add(this.elapsed))
 
@@ -1464,13 +1465,15 @@ func TestElapsedTime(t *testing.T) {
 		}
 	}
 
-	// Note: this test breaks in 2016
+	lastYear := time.Now().Year() - 1
+	lastYearString := strconv.Itoa(lastYear)
+
 	for i, this := range []struct {
 		date   time.Time
 		expect string
 	}{
-		{time.Date(2015, time.January, 1, 0, 0, 0, 0, time.UTC), "Jan 1"},
-		{time.Date(2014, time.January, 1, 0, 0, 0, 0, time.UTC), "Jan 1, 2014"},
+		{time.Date(time.Now().Year(), time.January, 1, 0, 0, 0, 0, time.UTC), "Jan 1"},
+		{time.Date(lastYear, time.January, 1, 0, 0, 0, 0, time.UTC), "Jan 1, " + lastYearString},
 	} {
 		result, err := ElapsedTime(this.date)
 

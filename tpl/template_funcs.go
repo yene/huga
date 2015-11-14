@@ -1157,12 +1157,14 @@ func Replace(a, b, c interface{}) (string, error) {
 	return strings.Replace(aStr, bStr, cStr, -1), nil
 }
 
-// ElapsedTime converts elapsed duration to the nearest human
-// readable presentation.
+// ElapsedTime makes a date easy to understand for humans.
 func ElapsedTime(t time.Time) (string, error) {
-	// TODO: check if it really is a date, make a test with a string
-	// TODO: localize date format it? is it localized
 	diff := time.Now().Sub(t)
+	sec := int(diff.Seconds())
+	if sec < 60 {
+		return fmt.Sprintf("%d seconds ago", sec), nil
+	}
+
 	min := int(diff.Minutes())
 	if min < 60 {
 		if min == 1 {
@@ -1180,7 +1182,7 @@ func ElapsedTime(t time.Time) (string, error) {
 	}
 
 	days := int(diff.Hours() / 24)
-	if days < 30 {
+	if days <= 5 {
 		if days == 1 {
 			return fmt.Sprintf("%d day ago", days), nil
 		}
@@ -1189,11 +1191,9 @@ func ElapsedTime(t time.Time) (string, error) {
 
 	if t.Year() == time.Now().Year() {
 		return t.Format("Jan 2"), nil
-	} else {
-		return t.Format("Jan 2, 2006"), nil
 	}
 
-	return "", nil // Todo: return error, bogus date
+	return t.Format("Jan 2, 2006"), nil
 }
 
 // DateFormat converts the textual representation of the datetime string into
